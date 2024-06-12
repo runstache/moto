@@ -10451,6 +10451,9 @@
                   "Value": "HTTPS"
                 }
               },
+              "bedrock": {
+                "Value": "bedrock"
+              },
               "budgets": {
                 "Value": "budgets",
                 "endpoint": {
@@ -11684,6 +11687,15 @@
                   "Value": "HTTPS"
                 }
               },
+              "opensearchserverless": {
+                "Value": "opensearchserverless",
+                "endpoint": {
+                  "Value": "aoss.ap-south-1.amazonaws.com"
+                },
+                "protocols": {
+                  "Value": "HTTPS"
+                }
+              },
               "opsworks": {
                 "Value": "opsworks",
                 "endpoint": {
@@ -12315,7 +12327,10 @@
                 }
               },
               "thinclient": {
-                "Value": "thinclient"
+                "Value": "thinclient",
+                "endpoint": {
+                  "Value": "api.thinclient.ap-south-1.amazonaws.com"
+                }
               },
               "timestream-influxdb": {
                 "Value": "timestream-influxdb",
@@ -15768,6 +15783,12 @@
                   "Value": "HTTPS"
                 }
               },
+              "repostspace": {
+                "Value": "repostspace",
+                "endpoint": {
+                  "Value": "repostspace.ap-southeast-1.amazonaws.com"
+                }
+              },
               "resiliencehub": {
                 "Value": "resiliencehub",
                 "endpoint": {
@@ -18517,6 +18538,12 @@
                 },
                 "protocols": {
                   "Value": "HTTPS"
+                }
+              },
+              "repostspace": {
+                "Value": "repostspace",
+                "endpoint": {
+                  "Value": "repostspace.ap-southeast-2.amazonaws.com"
                 }
               },
               "resiliencehub": {
@@ -23634,6 +23661,12 @@
                   "Value": "HTTPS"
                 }
               },
+              "repostspace": {
+                "Value": "repostspace",
+                "endpoint": {
+                  "Value": "repostspace.ca-central-1.amazonaws.com"
+                }
+              },
               "resiliencehub": {
                 "Value": "resiliencehub",
                 "endpoint": {
@@ -24046,7 +24079,10 @@
                 }
               },
               "thinclient": {
-                "Value": "thinclient"
+                "Value": "thinclient",
+                "endpoint": {
+                  "Value": "api.thinclient.ca-central-1.amazonaws.com"
+                }
               },
               "tnb": {
                 "Value": "tnb",
@@ -24438,6 +24474,15 @@
                   "Value": "HTTPS"
                 }
               },
+              "controltower": {
+                "Value": "controltower",
+                "endpoint": {
+                  "Value": "controltower.ca-west-1.amazonaws.com"
+                },
+                "protocols": {
+                  "Value": "HTTPS"
+                }
+              },
               "datasync": {
                 "Value": "datasync",
                 "endpoint": {
@@ -24630,6 +24675,60 @@
                   "Value": "HTTPS"
                 }
               },
+              "fms": {
+                "Value": "fms",
+                "endpoint": {
+                  "Value": "fms.ca-west-1.amazonaws.com"
+                },
+                "protocols": {
+                  "Value": "HTTPS"
+                }
+              },
+              "fsx": {
+                "Value": "fsx",
+                "endpoint": {
+                  "Value": "fsx.ca-west-1.amazonaws.com"
+                },
+                "protocols": {
+                  "Value": "HTTPS"
+                }
+              },
+              "fsx-lustre": {
+                "Value": "fsx-lustre",
+                "endpoint": {
+                  "Value": "fsx.ca-west-1.amazonaws.com"
+                },
+                "protocols": {
+                  "Value": "HTTPS"
+                }
+              },
+              "fsx-ontap": {
+                "Value": "fsx-ontap",
+                "endpoint": {
+                  "Value": "fsx.ca-west-1.amazonaws.com"
+                },
+                "protocols": {
+                  "Value": "HTTPS"
+                }
+              },
+              "fsx-openzfs": {
+                "Value": "fsx-openzfs",
+                "endpoint": {
+                  "Value": "fsx.ca-west-1.amazonaws.com"
+                },
+                "protocols": {
+                  "Value": "HTTPS"
+                }
+              },
+              "fsx-windows": {
+                "Value": "fsx-windows",
+                "endpoint": {
+                  "Value": "fsx.ca-west-1.amazonaws.com"
+                },
+                "protocols": {
+                  "Value": "HTTPS"
+                }
+              },
               "globalaccelerator": {
                 "Value": "globalaccelerator",
                 "endpoint": {
@@ -24742,6 +24841,15 @@
                 "Value": "license-manager-linux-subscriptions",
                 "endpoint": {
                   "Value": "license-manager-linux-subscriptions.ca-west-1.amazonaws.com"
+                },
+                "protocols": {
+                  "Value": "HTTPS"
+                }
+              },
+              "license-manager-user-subscriptions": {
+                "Value": "license-manager-user-subscriptions",
+                "endpoint": {
+                  "Value": "license-manager-user-subscriptions.ca-west-1.amazonaws.com"
                 },
                 "protocols": {
                   "Value": "HTTPS"
@@ -24987,6 +25095,15 @@
                   "Value": "HTTPS"
                 }
               },
+              "shield": {
+                "Value": "shield",
+                "endpoint": {
+                  "Value": "shield.us-east-1.amazonaws.com"
+                },
+                "protocols": {
+                  "Value": "HTTPS"
+                }
+              },
               "sns": {
                 "Value": "sns",
                 "endpoint": {
@@ -25068,6 +25185,15 @@
                   "Value": "HTTPS"
                 }
               },
+              "transfer": {
+                "Value": "transfer",
+                "endpoint": {
+                  "Value": "transfer.ca-west-1.amazonaws.com"
+                },
+                "protocols": {
+                  "Value": "HTTPS"
+                }
+              },
               "transitgateway": {
                 "Value": "transitgateway",
                 "endpoint": {
@@ -25096,6 +25222,15 @@
                 "Value": "vpn",
                 "endpoint": {
                   "Value": "ec2.ca-west-1.amazonaws.com"
+                },
+                "protocols": {
+                  "Value": "HTTPS"
+                }
+              },
+              "waf": {
+                "Value": "waf",
+                "endpoint": {
+                  "Value": "wafv2.ca-west-1.amazonaws.com"
                 },
                 "protocols": {
                   "Value": "HTTPS"
@@ -30525,7 +30660,10 @@
                 }
               },
               "thinclient": {
-                "Value": "thinclient"
+                "Value": "thinclient",
+                "endpoint": {
+                  "Value": "api.thinclient.eu-central-1.amazonaws.com"
+                }
               },
               "timestream": {
                 "Value": "timestream"
@@ -37263,6 +37401,9 @@
                   "Value": "HTTPS"
                 }
               },
+              "bedrock": {
+                "Value": "bedrock"
+              },
               "budgets": {
                 "Value": "budgets",
                 "endpoint": {
@@ -39135,6 +39276,12 @@
                   "Value": "HTTPS"
                 }
               },
+              "repostspace": {
+                "Value": "repostspace",
+                "endpoint": {
+                  "Value": "repostspace.eu-west-1.amazonaws.com"
+                }
+              },
               "resiliencehub": {
                 "Value": "resiliencehub",
                 "endpoint": {
@@ -39601,7 +39748,10 @@
                 }
               },
               "thinclient": {
-                "Value": "thinclient"
+                "Value": "thinclient",
+                "endpoint": {
+                  "Value": "api.thinclient.eu-west-1.amazonaws.com"
+                }
               },
               "timestream": {
                 "Value": "timestream"
@@ -41533,6 +41683,15 @@
               "omics": {
                 "Value": "omics"
               },
+              "opensearchserverless": {
+                "Value": "opensearchserverless",
+                "endpoint": {
+                  "Value": "aoss.eu-west-2.amazonaws.com"
+                },
+                "protocols": {
+                  "Value": "HTTPS"
+                }
+              },
               "opsworks": {
                 "Value": "opsworks",
                 "endpoint": {
@@ -42146,7 +42305,10 @@
                 }
               },
               "thinclient": {
-                "Value": "thinclient"
+                "Value": "thinclient",
+                "endpoint": {
+                  "Value": "api.thinclient.eu-west-2.amazonaws.com"
+                }
               },
               "transcribe": {
                 "Value": "transcribe",
@@ -43646,6 +43808,15 @@
                 "Value": "oam",
                 "endpoint": {
                   "Value": "oam.eu-west-3.amazonaws.com"
+                },
+                "protocols": {
+                  "Value": "HTTPS"
+                }
+              },
+              "opensearchserverless": {
+                "Value": "opensearchserverless",
+                "endpoint": {
+                  "Value": "aoss.eu-west-3.amazonaws.com"
                 },
                 "protocols": {
                   "Value": "HTTPS"
@@ -45444,6 +45615,12 @@
                 },
                 "protocols": {
                   "Value": "HTTPS"
+                }
+              },
+              "snowball": {
+                "Value": "snowball",
+                "endpoint": {
+                  "Value": "snowball.il-central-1.amazonaws.com"
                 }
               },
               "snowcone": {
@@ -53156,6 +53333,15 @@
                   "Value": "HTTPS"
                 }
               },
+              "qbusiness": {
+                "Value": "qbusiness",
+                "endpoint": {
+                  "Value": "qbusiness.us-east-1.api.aws"
+                },
+                "protocols": {
+                  "Value": "HTTPS"
+                }
+              },
               "qldb": {
                 "Value": "qldb",
                 "endpoint": {
@@ -53256,6 +53442,12 @@
                 },
                 "protocols": {
                   "Value": "HTTPS"
+                }
+              },
+              "repostspace": {
+                "Value": "repostspace",
+                "endpoint": {
+                  "Value": "repostspace.us-east-1.amazonaws.com"
                 }
               },
               "resiliencehub": {
@@ -53597,9 +53789,6 @@
               "snowcone": {
                 "Value": "snowcone"
               },
-              "snowmobile": {
-                "Value": "snowmobile"
-              },
               "sns": {
                 "Value": "sns",
                 "endpoint": {
@@ -53736,7 +53925,10 @@
                 }
               },
               "thinclient": {
-                "Value": "thinclient"
+                "Value": "thinclient",
+                "endpoint": {
+                  "Value": "api.thinclient.us-east-1.amazonaws.com"
+                }
               },
               "timestream": {
                 "Value": "timestream"
@@ -56276,9 +56468,6 @@
               "snowcone": {
                 "Value": "snowcone"
               },
-              "snowmobile": {
-                "Value": "snowmobile"
-              },
               "sns": {
                 "Value": "sns",
                 "endpoint": {
@@ -57812,9 +58001,6 @@
                 "endpoint": {
                   "Value": "snowball.us-gov-east-1.amazonaws.com"
                 }
-              },
-              "snowmobile": {
-                "Value": "snowmobile"
               },
               "sns": {
                 "Value": "sns",
@@ -59508,9 +59694,6 @@
                 "endpoint": {
                   "Value": "snowball.us-gov-west-1.amazonaws.com"
                 }
-              },
-              "snowmobile": {
-                "Value": "snowmobile"
               },
               "sns": {
                 "Value": "sns",
@@ -61562,9 +61745,6 @@
               "snowcone": {
                 "Value": "snowcone"
               },
-              "snowmobile": {
-                "Value": "snowmobile"
-              },
               "sns": {
                 "Value": "sns",
                 "endpoint": {
@@ -61829,6 +62009,9 @@
             "local-zones": {
               "usw2-den1-az1": {
                 "Value": "usw2-den1-az1"
+              },
+              "usw2-hnl1-az1": {
+                "Value": "usw2-hnl1-az1"
               },
               "usw2-las1-az1": {
                 "Value": "usw2-las1-az1"
@@ -64037,6 +64220,15 @@
                   "Value": "HTTPS"
                 }
               },
+              "qbusiness": {
+                "Value": "qbusiness",
+                "endpoint": {
+                  "Value": "qbusiness.us-west-2.api.aws"
+                },
+                "protocols": {
+                  "Value": "HTTPS"
+                }
+              },
               "qldb": {
                 "Value": "qldb",
                 "endpoint": {
@@ -64499,9 +64691,6 @@
               "snowcone": {
                 "Value": "snowcone"
               },
-              "snowmobile": {
-                "Value": "snowmobile"
-              },
               "sns": {
                 "Value": "sns",
                 "endpoint": {
@@ -64638,7 +64827,10 @@
                 }
               },
               "thinclient": {
-                "Value": "thinclient"
+                "Value": "thinclient",
+                "endpoint": {
+                  "Value": "api.thinclient.us-west-2.amazonaws.com"
+                }
               },
               "timestream": {
                 "Value": "timestream"

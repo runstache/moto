@@ -569,11 +569,17 @@ def random_ed25519_key_pair() -> Dict[str, str]:
         format=serialization.PrivateFormat.OpenSSH,
         encryption_algorithm=serialization.NoEncryption(),
     )
-    fingerprint = public_key_fingerprint(private_key.public_key())
+    public_key = private_key.public_key()
+    public_key_material = public_key.public_bytes(
+        encoding=serialization.Encoding.OpenSSH,
+        format=serialization.PublicFormat.OpenSSH,
+    )
+    fingerprint = public_key_fingerprint(public_key)
 
     return {
         "fingerprint": fingerprint,
         "material": private_key_material.decode("ascii"),
+        "material_public": public_key_material.decode("ascii"),
     }
 
 
@@ -586,11 +592,17 @@ def random_rsa_key_pair() -> Dict[str, str]:
         format=serialization.PrivateFormat.TraditionalOpenSSL,
         encryption_algorithm=serialization.NoEncryption(),
     )
-    fingerprint = public_key_fingerprint(private_key.public_key())
+    public_key = private_key.public_key()
+    public_key_material = public_key.public_bytes(
+        encoding=serialization.Encoding.OpenSSH,
+        format=serialization.PublicFormat.OpenSSH,
+    )
+    fingerprint = public_key_fingerprint(public_key)
 
     return {
         "fingerprint": fingerprint,
         "material": private_key_material.decode("ascii"),
+        "material_public": public_key_material.decode("ascii"),
     }
 
 
@@ -774,21 +786,23 @@ def filter_iam_instance_profile_associations(
 
 def filter_iam_instance_profiles(
     account_id: str,
+    partition: str,
     iam_instance_profile_arn: Optional[str],
     iam_instance_profile_name: Optional[str],
 ) -> Any:
     instance_profile = None
     instance_profile_by_name = None
     instance_profile_by_arn = None
+    backend = iam_backends[account_id][partition]
     if iam_instance_profile_name:
-        instance_profile_by_name = iam_backends[account_id][
-            "global"
-        ].get_instance_profile(iam_instance_profile_name)
+        instance_profile_by_name = backend.get_instance_profile(
+            iam_instance_profile_name
+        )
         instance_profile = instance_profile_by_name
     if iam_instance_profile_arn:
-        instance_profile_by_arn = iam_backends[account_id][
-            "global"
-        ].get_instance_profile_by_arn(iam_instance_profile_arn)
+        instance_profile_by_arn = backend.get_instance_profile_by_arn(
+            iam_instance_profile_arn
+        )
         instance_profile = instance_profile_by_arn
     # We would prefer instance profile that we found by arn
     if iam_instance_profile_arn and iam_instance_profile_name:

@@ -1,6 +1,105 @@
 Moto Changelog
 ==============
 
+5.0.9
+-----
+Docker Digest for 5.0.9: _sha256:df61e4e76344017f6c82924a3dd1cdd4dcbac4095cf234c6d6fb0a0f800fbeff_
+
+    General:
+        * Fixed an InfiniteRecursion-bug when accessing S3-buckets that was introduced in 5.0.8
+
+    New Methods:
+        * SSO-Admin:
+            * list_accounts_for_provisioned_permission_set()
+            * list_instances()
+            * list_permission_sets_provisioned_to_account()
+            * provision_permission_set()
+            * update_instance()
+
+    Miscellaneous:
+        * DynamoDB: query() now handles pagination correctly on a GSI without a range key
+        * IAM: create_policy() now returns tags correctly
+        * S3: list_objects(): The default value for MaxKeys can now be configured, using an environment variable:
+          MOTO_S3_DEFAULT_MAX_KEYS=1
+
+5.0.8
+-----
+Docker Digest for 5.0.8: _sha256:cfcd97074011bd563cdbeebac35ed710581a23cb2be07ab9b67aa00298fc3369_
+
+    General:
+        * Improved support for non-generic partitions (China, GovCloud, ISO-regions). 
+          All ARN's now contain the correct partition for resources created in those regions.
+
+    New Services:
+        * NetworkManager:
+            * create_global_network()
+            * describe_global_networks()
+            * create_core_network()
+            * create_global_network()
+            * delete_core_network()
+            * list_core_networks()
+            * get_core_network()
+            * tag_resource()
+            * untag_resource()
+
+    Miscellaneous:
+        * ResilienceHub: list_app_assessments() can now return pre-configured results
+        * ResourceGroupTagging: get_resources() now returns results when filtering on "lambda:function"
+        * S3: delete_object_tagging()/put_object_tagging() now send an EventBridge notification
+
+
+5.0.7
+-----
+Docker Digest for 5.0.7: _sha256:81ac52ff74b0bf0f4957ee4260e6a7e75d66c9e5d040ed4f721a5500b873c88a_
+
+    New Services:
+        * Sagemaker Metrics:
+            * batch_put_metrics()
+
+    New Methods:
+        * DynamoDB:
+            * describe_import()
+            * import_table()
+
+        * EMR Serverless:
+            * cancel_job_run()
+            * get_job_run()
+            * list_job_runs()
+            * start_job_run()
+
+        * IAM:
+            * tag_instance_profile()
+            * untag_instance_profile()
+
+        * Panorama:
+            * create_node_from_template_job()
+            * describe_node_from_template_job()
+            * list_nodes()
+
+        * SSO-Admin:
+            * describe_account_assignment_creation_status()
+            * describe_account_assignment_deletion_status()
+
+        * WAFv2:
+            * create_ip_set()
+            * delete_ip_set()
+            * list_ip_sets()
+            * get_ip_set()
+            * update_ip_set()
+            * put_logging_configuration()
+            * get_logging_configuration()
+            * list_logging_configurations()
+            * delete_logging_configuration()
+
+    Miscellaneous:
+        * Athena: start_query_execution() now supports the ExecutionParameters-parameter
+        * DynamoDB: Tables now support DeleteProtection
+        * DynamoDB: update_item() no longer throws an error when deleting an item from an empty set
+        * DynamoDB: update_item() no throws an error when adding an empty set
+        * EC2: delete_network_acl() now throws an error when the ACL still has associations attached to it
+        * EC2: describe_route_tables() now supports the `route.nat-gateway-id` filter
+        * EC2: revoke_security_group_ingress/_egress() now throw an error when an unknown Security Group is passed
+
 5.0.6
 -----
 Docker Digest for 5.0.6: _sha256:da919d3c1db07b378c413ed00a6c1c3e32ce1943a13671658c4db0f55dd49e42_

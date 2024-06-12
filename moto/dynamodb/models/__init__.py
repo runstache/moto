@@ -6,7 +6,11 @@ from typing import Any, Dict, List, Optional, Set, Tuple, Union
 from moto.core.base_backend import BackendDict, BaseBackend
 from moto.core.exceptions import JsonRESTError
 from moto.core.utils import unix_time
-from moto.dynamodb.comparisons import get_expected, get_filter_expression
+from moto.dynamodb.comparisons import (
+    create_condition_expression_parser,
+    get_expected,
+    get_filter_expression,
+)
 from moto.dynamodb.exceptions import (
     BackupNotFoundException,
     ConditionalCheckFailed,
@@ -33,9 +37,13 @@ from moto.dynamodb.models.table import (
     RestoredTable,
     Table,
 )
+from moto.dynamodb.models.table_import import TableImport
 from moto.dynamodb.parsing import partiql
 from moto.dynamodb.parsing.executors import UpdateExpressionExecutor
-from moto.dynamodb.parsing.expressions import UpdateExpressionParser  # type: ignore
+from moto.dynamodb.parsing.expressions import (  # type: ignore
+    ExpressionAttributeName,
+    UpdateExpressionParser,
+)
 from moto.dynamodb.parsing.validators import UpdateExpressionValidator
 
 
@@ -44,6 +52,7 @@ class DynamoDBBackend(BaseBackend):
         super().__init__(region_name, account_id)
         self.tables: Dict[str, Table] = OrderedDict()
         self.backups: Dict[str, Backup] = OrderedDict()
+        self.table_imports: Dict[str, TableImport] = {}
 
     @staticmethod
     def default_vpc_endpoint_service(
@@ -60,11 +69,36 @@ class DynamoDBBackend(BaseBackend):
             base_endpoint_dns_names=[f"dynamodb.{service_region}.amazonaws.com"],
         )
 
-    def create_table(self, name: str, **params: Any) -> Table:
+    def create_table(
+        self,
+        name: str,
+        schema: List[Dict[str, str]],
+        throughput: Optional[Dict[str, int]],
+        attr: List[Dict[str, str]],
+        global_indexes: Optional[List[Dict[str, Any]]],
+        indexes: Optional[List[Dict[str, Any]]],
+        streams: Optional[Dict[str, Any]],
+        billing_mode: str,
+        sse_specification: Optional[Dict[str, Any]],
+        tags: List[Dict[str, str]],
+        deletion_protection_enabled: bool,
+    ) -> Table:
         if name in self.tables:
             raise ResourceInUseException(f"Table already exists: {name}")
         table = Table(
-            name, account_id=self.account_id, region=self.region_name, **params
+            name,
+            account_id=self.account_id,
+            region=self.region_name,
+            schema=schema,
+            throughput=throughput,
+            attr=attr,
+            global_indexes=global_indexes,
+            indexes=indexes,
+            streams=streams,
+            billing_mode=billing_mode,
+            sse_specification=sse_specification,
+            tags=tags,
+            deletion_protection_enabled=deletion_protection_enabled,
         )
         self.tables[name] = table
         return table
@@ -442,11 +476,12 @@ class DynamoDBBackend(BaseBackend):
 
         if not get_expected(expected).expr(item):
             raise ConditionalCheckFailed
-        condition_op = get_filter_expression(
+        condition_expression_parser = create_condition_expression_parser(
             condition_expression,
             expression_attribute_names,
             expression_attribute_values,
         )
+        condition_op = condition_expression_parser.parse()
         if not condition_op.expr(item):
             if (
                 return_values_on_condition_check_failure == "ALL_OLD"
@@ -483,6 +518,7 @@ class DynamoDBBackend(BaseBackend):
             item.validate_no_empty_key_values(attribute_updates, table.attribute_keys)  # type: ignore[union-attr]
 
         if update_expression:
+            # Validate the UpdateExpression itself has all information
             validator = UpdateExpressionValidator(
                 update_expression_ast,
                 expression_attribute_names=expression_attribute_names,
@@ -500,6 +536,24 @@ class DynamoDBBackend(BaseBackend):
                 ).execute()
             except ItemSizeTooLarge:
                 raise ItemSizeToUpdateTooLarge()
+
+            # Ensure all ExpressionAttributeNames are requested
+            # Either in the Condition, or in the UpdateExpression
+            attr_name_clauses = update_expression_ast.find_clauses(
+                [ExpressionAttributeName]
+            )
+            attr_names_in_expression = [
+                attr.get_attribute_name_placeholder() for attr in attr_name_clauses
+            ]
+            attr_names_in_condition = condition_expression_parser.expr_attr_names_found
+            for attr_name in expression_attribute_names:
+                if (
+                    attr_name not in attr_names_in_expression
+                    and attr_name not in attr_names_in_condition
+                ):
+                    raise MockValidationException(
+                        f"Value provided in ExpressionAttributeNames unused in expressions: keys: {{{attr_name}}}"
+                    )
         else:
             item.update_with_attribute_updates(attribute_updates)  # type: ignore
         if table.stream_shard is not None:
@@ -908,6 +962,42 @@ class DynamoDBBackend(BaseBackend):
             except Exception as e:
                 responses[idx] = {"Error": {"Code": e.name, "Message": e.message}}  # type: ignore
         return responses
+
+    def import_table(
+        self,
+        s3_source: Dict[str, str],
+        input_format: Optional[str],
+        compression_type: Optional[str],
+        table_name: str,
+        billing_mode: str,
+        throughput: Optional[Dict[str, int]],
+        key_schema: List[Dict[str, str]],
+        global_indexes: Optional[List[Dict[str, Any]]],
+        attrs: List[Dict[str, str]],
+    ) -> TableImport:
+        """
+        Only InputFormat=DYNAMODB_JSON is supported so far.
+        InputCompressionType=ZSTD is not supported.
+        Other parameters that are not supported: InputFormatOptions, CloudWatchLogGroupArn
+        """
+        table_import = TableImport(
+            account_id=self.account_id,
+            s3_source=s3_source,
+            region_name=self.region_name,
+            table_name=table_name,
+            billing_mode=billing_mode,
+            throughput=throughput,
+            key_schema=key_schema,
+            global_indexes=global_indexes,
+            attrs=attrs,
+            compression_type=compression_type,
+        )
+        self.table_imports[table_import.arn] = table_import
+        table_import.start()
+        return table_import
+
+    def describe_import(self, import_arn: str) -> TableImport:
+        return self.table_imports[import_arn]
 
 
 dynamodb_backends = BackendDict(DynamoDBBackend, "dynamodb")

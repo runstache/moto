@@ -19,6 +19,7 @@ from moto.dynamodb.limits import HASH_KEY_MAX_LENGTH, RANGE_KEY_MAX_LENGTH
 from moto.dynamodb.models.dynamo_type import DynamoType, Item
 from moto.dynamodb.models.utilities import dynamo_json_dump
 from moto.moto_api._internal import mock_random
+from moto.utilities.utils import get_partition
 
 RESULT_SIZE_LIMIT = 1000000  # DynamoDB has a 1MB size limit
 
@@ -210,9 +211,7 @@ class StreamShard(BaseModel):
         from moto.awslambda.utils import get_backend
 
         for arn, esm in self.table.lambda_event_source_mappings.items():
-            region = arn[
-                len("arn:aws:lambda:") : arn.index(":", len("arn:aws:lambda:"))
-            ]
+            region = arn.split(":")[3]
 
             result = get_backend(self.account_id, region).send_dynamodb_items(
                 arn, self.items, esm.event_source_arn
@@ -386,14 +385,22 @@ class Table(CloudFormationModel):
             params["schema"] = properties["KeySchema"]
         if "AttributeDefinitions" in properties:
             params["attr"] = properties["AttributeDefinitions"]
-        if "GlobalSecondaryIndexes" in properties:
-            params["global_indexes"] = properties["GlobalSecondaryIndexes"]
-        if "ProvisionedThroughput" in properties:
-            params["throughput"] = properties["ProvisionedThroughput"]
-        if "LocalSecondaryIndexes" in properties:
-            params["indexes"] = properties["LocalSecondaryIndexes"]
-        if "StreamSpecification" in properties:
-            params["streams"] = properties["StreamSpecification"]
+        params["global_indexes"] = properties.get("GlobalSecondaryIndexes", [])
+        params["throughput"] = properties.get("ProvisionedThroughput")
+        params["indexes"] = properties.get("LocalSecondaryIndexes", [])
+        params["streams"] = properties.get("StreamSpecification")
+        params["tags"] = properties.get("Tags")
+        params["deletion_protection_enabled"] = properties.get(
+            "DeletionProtectionEnabled", False
+        )
+        params["sse_specification"] = properties.get("SSESpecification")
+
+        billing_mode = (
+            "PAY_PER_REQUEST"
+            if properties.get("BillingMode") == "PAY_PER_REQUEST"
+            else "PROVISIONED"
+        )
+        params["billing_mode"] = billing_mode
 
         table = dynamodb_backends[account_id][region_name].create_table(
             name=resource_name, **params
@@ -413,7 +420,7 @@ class Table(CloudFormationModel):
         dynamodb_backends[account_id][region_name].delete_table(name=resource_name)
 
     def _generate_arn(self, name: str) -> str:
-        return f"arn:aws:dynamodb:{self.region_name}:{self.account_id}:table/{name}"
+        return f"arn:{get_partition(self.region_name)}:dynamodb:{self.region_name}:{self.account_id}:table/{name}"
 
     def set_stream_specification(self, streams: Optional[Dict[str, Any]]) -> None:
         self.stream_specification = streams
@@ -695,11 +702,12 @@ class Table(CloudFormationModel):
                     key for key in index.schema if key["KeyType"] == "RANGE"
                 ][0]
             except IndexError:
-                if isinstance(index, GlobalSecondaryIndex):
-                    # If we're querying a GSI that does not have an index, the main hash key acts as a range key
-                    index_range_key = {"AttributeName": self.hash_key_attr}
+                if isinstance(index, GlobalSecondaryIndex) and self.range_key_attr:
+                    # If we're querying a GSI that does not have a range key, the main range key acts as a range key
+                    index_range_key = {"AttributeName": self.range_key_attr}
                 else:
-                    index_range_key = None
+                    # If we don't have a range key on the main table either, the hash key acts as a range key
+                    index_range_key = {"AttributeName": self.hash_key_attr}
                 if range_comparison:
                     raise ValueError(
                         f"Range Key comparison but no range key found for index: {index_name}"
@@ -1061,7 +1069,7 @@ class Backup:
 
     @property
     def arn(self) -> str:
-        return f"arn:aws:dynamodb:{self.region_name}:{self.account_id}:table/{self.table.name}/backup/{self.identifier}"
+        return f"arn:{get_partition(self.region_name)}:dynamodb:{self.region_name}:{self.account_id}:table/{self.table.name}/backup/{self.identifier}"
 
     @property
     def details(self) -> Dict[str, Any]:  # type: ignore[misc]

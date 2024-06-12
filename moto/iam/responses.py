@@ -9,7 +9,7 @@ class IamResponse(BaseResponse):
 
     @property
     def backend(self) -> IAMBackend:
-        return iam_backends[self.current_account]["global"]
+        return iam_backends[self.current_account][self.partition]
 
     def attach_role_policy(self) -> str:
         policy_arn = self._get_param("PolicyArn")
@@ -1128,6 +1128,28 @@ class IamResponse(BaseResponse):
         )
         return template.render()
 
+    def tag_instance_profile(self) -> str:
+        instance_profile_name = self._get_param("InstanceProfileName")
+        tags = self._get_multi_param("Tags.member")
+
+        self.backend.tag_instance_profile(
+            instance_profile_name=instance_profile_name,
+            tags=tags,
+        )
+        template = self.response_template(TAG_INSTANCE_PROFILE_TEMPLATE)
+        return template.render()
+
+    def untag_instance_profile(self) -> str:
+        instance_profile_name = self._get_param("InstanceProfileName")
+        tags = self._get_multi_param("TagKeys.member")
+
+        self.backend.untag_instance_profile(
+            instance_profile_name=instance_profile_name,
+            tagKeys=tags,
+        )
+        template = self.response_template(UNTAG_INSTANCE_PROFILE_TEMPLATE)
+        return template.render()
+
 
 LIST_ENTITIES_FOR_POLICY_TEMPLATE = """<ListEntitiesForPolicyResponse>
  <ListEntitiesForPolicyResult>
@@ -1217,14 +1239,16 @@ CREATE_POLICY_TEMPLATE = """<CreatePolicyResponse>
       <PolicyId>{{ policy.id }}</PolicyId>
       <PolicyName>{{ policy.name }}</PolicyName>
       <UpdateDate>{{ policy.updated_iso_8601 }}</UpdateDate>
+      {% if policy.tags %}
       <Tags>
-        {% for tag_key, tag_value in policy.tags.items() %}
+        {% for tag in policy.get_tags() %}
         <member>
-          <Key>{{ tag_key }}</Key>
-          <Value>{{ tag_value }}</Value>
+            <Key>{{ tag['Key'] }}</Key>
+            <Value>{{ tag['Value'] }}</Value>
         </member>
         {% endfor %}
       </Tags>
+      {% endif %}
     </Policy>
   </CreatePolicyResult>
   <ResponseMetadata>
@@ -2774,3 +2798,17 @@ UNTAG_USER_TEMPLATE = """<UntagUserResponse xmlns="https://iam.amazonaws.com/doc
     <RequestId>EXAMPLE8-90ab-cdef-fedc-ba987EXAMPLE</RequestId>
   </ResponseMetadata>
 </UntagUserResponse>"""
+
+TAG_INSTANCE_PROFILE_TEMPLATE = """<TagInstanceProfileResponse xmlns="https://iam.amazonaws.com/doc/2010-05-08/">
+  <ResponseMetadata>
+    <RequestId>EXAMPLE8-90ab-cdef-fedc-ba987EXAMPLE</RequestId>
+  </ResponseMetadata>
+</TagInstanceProfileResponse>
+"""
+
+UNTAG_INSTANCE_PROFILE_TEMPLATE = """<UntagInstanceProfileResponse xmlns="https://iam.amazonaws.com/doc/2010-05-08/">
+  <ResponseMetadata>
+    <RequestId>EXAMPLE8-90ab-cdef-fedc-ba987EXAMPLE</RequestId>
+  </ResponseMetadata>
+</UntagInstanceProfileResponse>
+"""
